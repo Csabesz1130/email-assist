@@ -1,8 +1,8 @@
 // Import the necessary NLP library or API client
-import language from '@google-cloud/language';
+import { LanguageServiceClient } from '@google-cloud/language';
 
 // Instantiate the client for Google Natural Language API
-const client = new language.LanguageServiceClient();
+const client = new LanguageServiceClient();
 
 async function analyzeText(text) {
   const document = {
@@ -10,17 +10,16 @@ async function analyzeText(text) {
     type: 'PLAIN_TEXT',
   };
 
-  // Detects the entities of the text
   const [result] = await client.analyzeEntities({document});
   const entities = result.entities;
 
-  // Filter entities based on types that correspond to event information
   const eventDetails = {
     title: entities.filter(entity => entity.type === 'WORK_OF_ART')[0]?.name,
     date: entities.filter(entity => entity.type === 'DATE')[0]?.name,
     time: entities.filter(entity => entity.type === 'TIME')[0]?.name,
     location: entities.filter(entity => entity.type === 'LOCATION')[0]?.name,
     attendees: entities.filter(entity => entity.type === 'PERSON').map(person => person.name),
+    links: extractLinksFromText(text) // Include extracted links
   };
 
   return eventDetails;
@@ -36,4 +35,9 @@ export async function extractEventDetails(emailText) {
     console.error('The API returned an error: ' + error);
     throw error;
   }
+}
+
+function extractLinksFromText(text) {
+  const linkRegex = /https?:\/\/[^\s]+/g;
+  return text.match(linkRegex) || [];
 }
