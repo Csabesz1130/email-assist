@@ -1,17 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { extractEventDetails } from './services/nlpService.mjs';
+import { parseEmail } from './utils/emailParser.mjs';
+import { storeEventDetails } from './models/eventModel.mjs';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+async function main() {
+  try {
+    const emailText = await parseEmail('path/to/email.eml');
+    const eventDetails = await extractEventDetails(emailText);
+    await storeEventDetails(eventDetails);
+    console.log('Event extraction and storage process completed successfully.');
+  } catch (error) {
+    console.error('Error in event extraction process:', error);
+  }
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+main();

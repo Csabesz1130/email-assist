@@ -1,39 +1,38 @@
-// Import the necessary NLP library or API client
-import language from '@google-cloud/language';
+import { LanguageServiceClient } from '@google-cloud/language';
 
-// Instantiate the client for Google Natural Language API
-const client = new language.LanguageServiceClient();
+const client = new LanguageServiceClient();
 
 async function analyzeText(text) {
-  const document = {
-    content: text,
-    type: 'PLAIN_TEXT',
-  };
-
-  // Detects the entities of the text
-  const [result] = await client.analyzeEntities({document});
-  const entities = result.entities;
-
-  // Filter entities based on types that correspond to event information
-  const eventDetails = {
-    title: entities.filter(entity => entity.type === 'WORK_OF_ART')[0]?.name,
-    date: entities.filter(entity => entity.type === 'DATE')[0]?.name,
-    time: entities.filter(entity => entity.type === 'TIME')[0]?.name,
-    location: entities.filter(entity => entity.type === 'LOCATION')[0]?.name,
-    attendees: entities.filter(entity => entity.type === 'PERSON').map(person => person.name),
-  };
-
-  return eventDetails;
+  const [result] = await client.analyzeEntities({ document: { content: text, type: 'PLAIN_TEXT' } });
+  return result.entities;
 }
 
-// Function to extract event details
-export async function extractEventDetails(emailText) {
-  try {
-    const eventInformation = await analyzeText(emailText);
-    // Here, you could add additional logic to refine or validate event details
-    return eventInformation;
-  } catch (error) {
-    console.error('The API returned an error: ' + error);
-    throw error;
-  }
+async function extractEventDetails(emailText) {
+  const entities = await analyzeText(emailText);
+  const title = entities.find(entity => entity.type === 'EVENT')?.name || '';
+  const date = entities.find(entity => entity.type === 'DATE')?.name || '';
+  const time = entities.find(entity => entity.type === 'TIME')?.name || '';
+  const location = entities.find(entity => entity.type === 'LOCATION')?.name || '';
+  const attendees = entities.filter(entity => entity.type === 'PERSON').map(entity => entity.name);
+  const links = extractLinksFromText(emailText); // New function to extract links
+
+  return {
+    title,
+    date,
+    time,
+    location,
+    attendees,
+    links // Include extracted links in the return object
+  };
 }
+
+function generateNotesFromEntities(entities) {
+  return entities.map(entity => `${entity.name} is a ${entity.type.toLowerCase()}`).join('\n');
+}
+
+function extractLinksFromText(text) {
+  const linkRegex = /https?:\/\/[^\s]+/g;
+  return text.match(linkRegex) || [];
+}
+
+export { extractEventDetails };
