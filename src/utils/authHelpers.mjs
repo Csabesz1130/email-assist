@@ -1,9 +1,17 @@
 import jwt from 'jsonwebtoken';
 
-const secretKey = 'your_secret_key_here';
+// Use process.env to store the secret key
+const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key_here';
 
 export const generateToken = (user) => {
-  return jwt.sign({ userId: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+  const payload = { userId: user.id, email: user.email };
+  const options = { expiresIn: '1h' };
+
+  try {
+    return jwt.sign(payload, secretKey, options);
+  } catch (error) {
+    throw new Error('Error generating token: ' + error.message);
+  }
 };
 
 export const verifyToken = (token) => {
@@ -15,9 +23,17 @@ export const verifyToken = (token) => {
 };
 
 export const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) {
+  const authHeader = req.headers['authorization'];
+
+  if (!authHeader) {
     return res.status(401).json({ error: 'No token provided' });
+  }
+
+  const tokenStart = authHeader.indexOf('Bearer ') + 'Bearer '.length;
+  const token = authHeader.substring(tokenStart);
+
+  if (!token) {
+    return res.status(401).json({ error: 'Invalid token format' });
   }
 
   const decoded = verifyToken(token);
