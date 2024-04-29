@@ -5,8 +5,8 @@ import './TaskList.css';
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
-  const [editTaskId, setEditTaskId] = useState(null);
-  const [editTaskDescription, setEditTaskDescription] = useState('');
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingTaskDescription, setEditingTaskDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -28,7 +28,19 @@ const TaskList = () => {
     }
   };
 
+  const handleEditTask = (taskId, taskDescription) => {
+    setEditingTaskId(taskId);
+    setEditingTaskDescription(taskDescription);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTaskId(null);
+    setEditingTaskDescription('');
+  };
+
   const createTask = async () => {
+    if (!newTask.trim()) return;
+
     setLoading(true);
     try {
       const response = await axios.post('/api/tasks', { description: newTask });
@@ -44,13 +56,15 @@ const TaskList = () => {
   };
 
   const updateTask = async () => {
+    if (!editingTaskDescription.trim()) return;
+
     setLoading(true);
     try {
-      const response = await axios.put(`/api/tasks/${editTaskId}`, { description: editTaskDescription });
-      const updatedTasks = tasks.map((task) => (task._id === editTaskId ? response.data : task));
+      const response = await axios.put(`/api/tasks/${editingTaskId}`, { description: editingTaskDescription });
+      const updatedTasks = tasks.map((task) => (task._id === editingTaskId ? response.data : task));
       setTasks(updatedTasks);
-      setEditTaskId(null);
-      setEditTaskDescription('');
+      setEditingTaskId(null);
+      setEditingTaskDescription('');
       setError('');
     } catch (err) {
       console.error('Error updating task:', err);
@@ -84,21 +98,22 @@ const TaskList = () => {
         <ul>
           {tasks.map((task) => (
             <li key={task._id} className="task-item">
-              {editTaskId === task._id ? (
+              {editingTaskId === task._id ? (
                 <div className="edit-task">
                   <input
                     type="text"
-                    value={editTaskDescription}
-                    onChange={(e) => setEditTaskDescription(e.target.value)}
+                    value={editingTaskDescription}
+                    onChange={(e) => setEditingTaskDescription(e.target.value)}
                     className="edit-task-input"
                   />
                   <button onClick={updateTask} className="save-button">Save</button>
+                  <button onClick={handleCancelEdit} className="cancel-button">Cancel</button>
                 </div>
               ) : (
                 <div className="task-details">
                   <span className="task-description">{task.description}</span>
                   <div className="task-actions">
-                    <button onClick={() => setEditTaskId(task._id)} className="edit-button">Edit</button>
+                    <button onClick={() => handleEditTask(task._id, task.description)} className="edit-button">Edit</button>
                     <button onClick={() => deleteTask(task._id)} className="delete-button">Delete</button>
                   </div>
                 </div>
