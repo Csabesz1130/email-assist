@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import * as CalendarService from '../services/calendarService.mjs';
 import { authenticateToken } from '../utils/authHelpers.mjs';
 
 const router = Router();
 
-router.get('/events', authenticateToken, async (req: Request, res: Response) => {
+router.get('/events', authenticateToken, async (req, res) => {
   try {
     const events = await CalendarService.getEvents();
     res.status(200).json(events);
@@ -13,7 +13,7 @@ router.get('/events', authenticateToken, async (req: Request, res: Response) => 
   }
 });
 
-router.post('/events', authenticateToken, async (req: Request, res: Response) => {
+router.post('/events', authenticateToken, async (req, res) => {
   try {
     const newEvent = await CalendarService.createEvent(req.body);
     res.status(201).json(newEvent);
@@ -22,7 +22,7 @@ router.post('/events', authenticateToken, async (req: Request, res: Response) =>
   }
 });
 
-router.put('/events/:id', authenticateToken, async (req: Request, res: Response) => {
+router.put('/events/:id', authenticateToken, async (req, res) => {
   try {
     const updatedEvent = await CalendarService.updateEvent(req.params.id, req.body);
     res.status(200).json(updatedEvent);
@@ -31,7 +31,7 @@ router.put('/events/:id', authenticateToken, async (req: Request, res: Response)
   }
 });
 
-router.delete('/events/:id', authenticateToken, async (req: Request, res: Response) => {
+router.delete('/events/:id', authenticateToken, async (req, res) => {
   try {
     await CalendarService.deleteEvent(req.params.id);
     res.sendStatus(204);
