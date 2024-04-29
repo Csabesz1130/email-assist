@@ -70,7 +70,7 @@ const TaskList = () => {
       console.error('Error updating task:', err);
       setError('Failed to update task');
     } finally {
-      setLoading(false);
+      setLoading(false); //jh
     }
   };
 
