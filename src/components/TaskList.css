@@ -1,0 +1,91 @@
+.task-list-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-list-header {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .task-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #ffffff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-item:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .task-item-editing {
+    border: 2px solid #4a90e2;
+  }
+  
+  .task-item input[type="text"] {
+    border: none;
+    padding: 5px;
+    margin-right: 10px;
+    width: 100%;
+  }
+  
+  .task-item button {
+    padding: 5px 10px;
+    margin-left: auto;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #4a90e2;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .task-item button:hover {
+    background-color: #357abd;
+  }
+  
+  .task-add-container {
+    display: flex;
+    margin-top: 20px;
+  }
+  
+  .task-add-input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+  
+  .task-add-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #5cb85c;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .task-add-button:hover {
+    background-color: #4cae4c;
+  }
+  
+  .error {
+    color: #d9534f;
+  }
+  
+  /* Add any other effects or transitions you want to include */
+  
