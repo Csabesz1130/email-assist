@@ -1,18 +1,26 @@
-import { io } from './server.js';  // Ensure this imports correctly based on your server setup
+import { io } from './server.js';
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  // Listening for task updates
   socket.on('task-update', (task) => {
+    if (!task || !task.id) {
+      console.warn('Invalid task update received:', task);
+      return;
+    }
+
     console.log('Task update received:', task);
-    io.emit('task-updated', task);  // Broadcast to all clients
+    io.emit('task-updated', task);
   });
 
-  // Listening for event updates
   socket.on('event-update', (event) => {
+    if (!event || !event.id) {
+      console.warn('Invalid event update received:', event);
+      return;
+    }
+
     console.log('Event update received:', event);
-    io.emit('event-updated', event);  // Broadcast to all clients
+    io.emit('event-updated', event);
   });
 
   socket.on('disconnect', () => {
