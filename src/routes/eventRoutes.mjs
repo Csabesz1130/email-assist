@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as CalendarService from '../services/calendarService.mjs';
+import * as UserPreferencesService from '../services/userPreferencesService.mjs';
 import { authenticateToken } from '../utils/authHelpers.mjs';
 
 const router = Router();
@@ -35,6 +36,24 @@ router.delete('/events/:id', authenticateToken, async (req, res) => {
   try {
     await CalendarService.deleteEvent(req.params.id);
     res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Route to handle user preferences
+router.post('/user/preferences', authenticateToken, async (req, res) => {
+  try {
+    const { emailNotifications, theme } = req.body;
+    const userId = req.userId; // Assuming the user ID is available in the authenticated request
+
+    // Save preferences to the database
+    await UserPreferencesService.updateUserPreferences(userId, {
+      emailNotifications,
+      theme,
+    });
+
+    res.status(200).json({ message: 'Preferences saved successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
